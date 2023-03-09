@@ -1,10 +1,9 @@
-from django.test import TestCase, Client
-from ..models import Post, Group
-from django.contrib.auth import get_user_model
-from django.urls import reverse
 from django import forms
-from posts.forms import PostForm
+from django.contrib.auth import get_user_model
+from django.test import Client, TestCase
+from django.urls import reverse
 
+from ..models import Group, Post
 
 User = get_user_model()
 
@@ -55,10 +54,7 @@ class ViewTests(TestCase):
     def test_post_detail_show_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом."""
         response = self.no_authorized_client.get(
-            reverse(
-                'posts:post_detail', kwargs={'post_id': self.post.id}
-                )
-            )
+            reverse('posts:post_detail', kwargs={'post_id': self.post.id}))
         post_response = response.context.get('post')
         self.assertEqual(post_response.text, self.post.text)
         self.assertEqual(post_response.author, self.post.author)
@@ -66,11 +62,7 @@ class ViewTests(TestCase):
 
     def test_post_create_page_show_context(self):
         """Шаблон post_create сформирован с правильным контекстом."""
-        response = self.authorized_client.get(
-            reverse(
-                'posts:post_create'
-                )
-            )
+        response = self.authorized_client.get(reverse('posts:post_create'))
         form_fields = {
             'text': forms.fields.CharField,
             'group': forms.fields.ChoiceField
@@ -83,10 +75,7 @@ class ViewTests(TestCase):
     def test_post_edit_page_show_context(self):
         """Шаблон post_create сформирован с правильным контекстом."""
         response = self.authorized_client.get(
-            reverse(
-                'posts:post_edit', kwargs={'post_id': self.post.id}
-                )
-            )
+            reverse('posts:post_edit', kwargs={'post_id': self.post.id}))
         form_fields = {
             'text': forms.fields.CharField,
             'group': forms.fields.ChoiceField

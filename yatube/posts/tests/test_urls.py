@@ -28,11 +28,11 @@ class URLTests(TestCase):
     def test_urls_no_authorized_client(self):
         """Тестирование страниц для всех пользователей"""
         url_list = {
-              '/': 200,
-              f'/group/{self.group.slug}/': 200,
-              f'/profile/{self.author.username}/': 200,
-              f'/posts/{self.post.id}/': 200,
-              'unexisting_page/': 404
+            '/': 200,
+            f'/group/{self.group.slug}/': 200,
+            f'/profile/{self.author.username}/': 200,
+            f'/posts/{self.post.id}/': 200,
+            'unexisting_page/': 404
         }
         for url, status_code in url_list.items():
             with self.subTest(url=url):
