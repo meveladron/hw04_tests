@@ -37,8 +37,8 @@ class URLTests(TestCase):
         for url, status_code in url_list.items():
             with self.subTest(url=url):
                 self.assertEqual(
-                      self.no_authorized_client.get(url).status_code,
-                      status_code
+                    self.no_authorized_client.get(url).status_code,
+                    status_code
                 )
 
     def test_urls_authorized_client(self):

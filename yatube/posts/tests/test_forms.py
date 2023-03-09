@@ -49,7 +49,7 @@ class PostFormTests(TestCase):
         form_data = {
             "text": 'Тестовый текст',
             "group": self.group.id
-            }
+        }
         response = self.authorized_client.post(
             reverse(
                 'posts:post_edit', kwargs={'post_id': self.post.id}),

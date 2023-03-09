@@ -27,8 +27,8 @@ class PostModelTest(TestCase):
             'author': 'Автор'
         }
         cls.help_text_argument = {
-             'text': 'Введите текст публикации',
-             'group': 'Выберите группу, соотвестсвующую публикации'
+            'text': 'Введите текст публикации',
+            'group': 'Выберите группу, соотвестсвующую публикации'
         }
 
     def test_models_have_correct_object_names(self):
