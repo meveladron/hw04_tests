@@ -5,6 +5,8 @@ from ..models import Group, Post
 
 User = get_user_model()
 
+TEXT_LENGHT: int = 15
+
 
 class PostModelTest(TestCase):
     @classmethod
@@ -18,7 +20,7 @@ class PostModelTest(TestCase):
         )
         cls.post = Post.objects.create(
             author=cls.user,
-            text='Тестовое описание',
+            text='Тестовое описание публикации',
         )
         cls.verbose_argument = {
             'text': 'Описание',
@@ -33,9 +35,9 @@ class PostModelTest(TestCase):
 
     def test_models_have_correct_object_names(self):
         '''Проверка длины метода __str__ в модели Post'''
-        value_posts = self.post.text[:15]
-        error = f'Ошибка. Вывод не имеет {value_posts} символов'
-        self.assertEqual(self.post.__str__(), value_posts, error)
+        value_posts = self.post.text[:TEXT_LENGHT]
+        error = f'Ошибка. Вывод не имеет {TEXT_LENGHT} символов'
+        self.assertEqual(str(self.post), value_posts, error)
 
     def test_verbose_name(self):
         '''Проверка заполнения поля модели verbose_name'''

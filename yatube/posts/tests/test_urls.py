@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 
@@ -24,56 +26,54 @@ class URLTests(TestCase):
             text='Тестовый пост',
             group=cls.group,
         )
-
-    def test_urls_no_authorized_client(self):
-        """Тестирование страниц для всех пользователей"""
-        url_list = {
-            '/': 200,
-            f'/group/{self.group.slug}/': 200,
-            f'/profile/{self.author.username}/': 200,
-            f'/posts/{self.post.id}/': 200,
-            'unexisting_page/': 404
+        cls.urls_client = {
+            '/',
+            f'/group/{cls.group.slug}/',
+            f'/profile/{cls.author.username}/',
+            f'/posts/{cls.post.id}/'
         }
-        for url, status_code in url_list.items():
+        cls.templates_url_names = {
+            '/': 'posts/index.html',
+            f'/group/{cls.post.group.slug}/': 'posts/group_list.html',
+            f'/profile/{cls.post.author}/': 'posts/profile.html',
+            f'/posts/{cls.post.id}/': 'posts/post_detail.html',
+            '/create/': 'posts/create_post.html',
+        }
+        cls.urls_all_client = {
+            '/': HTTPStatus.OK,
+            f'/group/{cls.group.slug}/': HTTPStatus.OK,
+            f'/profile/{cls.author.username}/': HTTPStatus.OK,
+            f'/posts/{cls.post.id}/': HTTPStatus.OK,
+            'unexisting_page/': HTTPStatus.NOT_FOUND
+        }
+
+    def test_urls_all_client(self):
+        """Тестирование страниц для всех пользователей"""
+        urls = self.urls_all_client
+        for url, status_code in urls.items():
             with self.subTest(url=url):
                 self.assertEqual(
                     self.no_authorized_client.get(url).status_code,
                     status_code
                 )
 
-    def test_urls_authorized_client(self):
+    def test_urls_no_authorized_client(self):
         """Тестирование доступов для неавторизованного пользователя"""
-        url_list = (
-            '/',
-            f'/group/{self.group.slug}/',
-            f'/profile/{self.author.username}/',
-            f'/posts/{self.post.id}/'
-        )
-        for url in url_list:
+        urls = self.urls_client
+        for url in urls:
             response = self.no_authorized_client.get(url)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    def test_urls_guest_client(self):
+    def test_urls_authorized_client(self):
         """Тестирование доступов для авторизованного пользователя"""
-        urls = (
-            '/',
-            f'/group/{self.group.slug}/',
-            f'/profile/{self.author.username}/',
-            f'/posts/{self.post.id}/'
-        )
+        urls = self.urls_client
         for url in urls:
             response = self.authorized_client.get(url)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_urls_uses_correct_template(self):
-        templates_url_names = {
-            '/': 'posts/index.html',
-            f'/group/{self.post.group.slug}/': 'posts/group_list.html',
-            f'/profile/{self.post.author}/': 'posts/profile.html',
-            f'/posts/{self.post.id}/': 'posts/post_detail.html',
-            '/create/': 'posts/create_post.html',
-        }
-        for adress, template in templates_url_names.items():
+        urls = self.templates_url_names
+        for adress, template in urls.items():
             with self.subTest(adress=adress):
                 self.assertTemplateUsed(
                     self.authorized_client.get(adress),

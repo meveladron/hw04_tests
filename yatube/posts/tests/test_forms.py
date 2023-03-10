@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -25,14 +27,18 @@ class PostFormTests(TestCase):
             text='Тестовый пост',
             group=cls.group
         )
+        cls.form_data_create = {'text': 'Тестовый текст'}
+        cls.form_data_edit = {
+            "text": 'Тестовый текст',
+            "group": cls.group.id
+        }
 
     def test_create_post(self):
         """Создание тестовой записи"""
         count = Post.objects.count() + 1
-        form_data = {'text': 'Тестовый текст'}
         response = self.authorized_client.post(
             reverse('posts:post_create'),
-            data=form_data,
+            data=self.form_data_edit,
             follow=True
         )
         self.assertRedirects(
@@ -40,20 +46,17 @@ class PostFormTests(TestCase):
             reverse('posts:profile', kwargs={'username': self.user.username})
         )
         self.assertEqual(Post.objects.count(), count)
-        self.assertTrue(Post.objects.filter(text='Тестовый текст').exists())
-        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Post.objects.filter(text=self.form_data_create["text"])
+                        .exists())
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_post_edit(self):
         """Редактирование тестовой записи"""
         count = Post.objects.count()
-        form_data = {
-            "text": 'Тестовый текст',
-            "group": self.group.id
-        }
         response = self.authorized_client.post(
             reverse(
                 'posts:post_edit', kwargs={'post_id': self.post.id}),
-            data=form_data,
+            data=self.form_data_create,
             follow=True
         )
         self.assertRedirects(
@@ -63,5 +66,6 @@ class PostFormTests(TestCase):
             )
         )
         self.assertEqual(Post.objects.count(), count)
-        self.assertTrue(Post.objects.filter(text="Тестовый текст").exists())
-        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Post.objects.filter(text=self.form_data_create['text'])
+                        .exists())
+        self.assertEqual(response.status_code, HTTPStatus.OK)
